@@ -216,8 +216,8 @@
       border-radius: var(--radius-lg);
       padding: 1.4rem;
       display: grid;
-      grid-template-columns: 1fr 270px;
-      gap: 1.6rem;
+      grid-template-columns: minmax(220px, 1.1fr) minmax(320px, 1.5fr) 240px;
+      gap: 1.4rem;
       align-items: stretch;
       box-shadow: var(--shadow-sm);
       transition: var(--transition);
@@ -234,12 +234,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 0.9rem;
+      gap: 0.85rem;
     }
 
     .card-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
+      font-size: 1.22rem;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -269,7 +269,7 @@
     }
 
     .card-address {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       display: flex;
       align-items: flex-start;
@@ -279,7 +279,7 @@
 
     .card-links {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.65rem;
       flex-wrap: wrap;
       margin-top: auto;
     }
@@ -288,11 +288,11 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--culvers-blue);
       text-decoration: none;
-      padding: 0.35rem 0.7rem;
+      padding: 0.3rem 0.65rem;
       border-radius: var(--radius-md);
       background-color: var(--surface-subtle);
       border: 1px solid var(--surface-border);
@@ -305,7 +305,122 @@
       border-color: var(--culvers-blue);
     }
 
-    /* Flavor of the Day Display - Large Hero Tile */
+    /* Upcoming 4-Day Flavor Calendar Strip */
+    .card-calendar {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 0.85rem;
+      gap: 0.55rem;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .calendar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .calendar-link-more {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--culvers-blue);
+      text-decoration: none;
+    }
+
+    .calendar-link-more:hover {
+      text-decoration: underline;
+    }
+
+    .upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+    }
+
+    .upcoming-day-card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: var(--transition);
+      min-width: 0;
+    }
+
+    .upcoming-day-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--culvers-blue-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .upcoming-date-pill {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--culvers-blue);
+      background: rgba(0, 86, 150, 0.08);
+      padding: 0.12rem 0.35rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .upcoming-img-wrapper {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.3rem;
+      overflow: hidden;
+    }
+
+    .upcoming-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .upcoming-flavor-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .upcoming-skeleton-item {
+      height: 90px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    /* Flavor of the Day Display - Today's Hero Tile */
     .card-flavor {
       display: flex;
       flex-direction: column;
@@ -342,7 +457,7 @@
 
     .flavor-img-wrapper {
       width: 100%;
-      height: 160px;
+      height: 150px;
       border-radius: var(--radius-md);
       overflow: hidden;
       display: flex;
@@ -386,8 +501,8 @@
       border-radius: var(--radius-lg);
       padding: 1.4rem;
       display: grid;
-      grid-template-columns: 1fr 270px;
-      gap: 1.6rem;
+      grid-template-columns: minmax(220px, 1.1fr) minmax(320px, 1.5fr) 240px;
+      gap: 1.4rem;
       align-items: center;
     }
 
@@ -402,7 +517,7 @@
 
     .skeleton-box {
       width: 100%;
-      height: 200px;
+      height: 190px;
       border-radius: var(--radius-md);
       background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
       background-size: 200% 100%;
@@ -438,11 +553,26 @@
       margin-top: auto;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 980px) {
+      .card {
+        grid-template-columns: 1fr 240px;
+      }
+      .card-calendar {
+        grid-column: 1 / -1;
+      }
+      .skeleton-card {
+        grid-template-columns: 1fr 240px;
+      }
+    }
+
+    @media (max-width: 680px) {
       .card {
         grid-template-columns: 1fr;
         padding: 1.25rem;
         gap: 1.25rem;
+      }
+      .card-calendar {
+        grid-column: 1;
       }
       .card-flavor {
         width: 100%;
@@ -450,7 +580,7 @@
         padding: 1.25rem;
       }
       .flavor-img-wrapper {
-        height: 190px;
+        height: 180px;
       }
       .flavor-name {
         font-size: 1.25rem;
@@ -459,7 +589,7 @@
         grid-template-columns: 1fr;
       }
       .skeleton-box {
-        height: 180px;
+        height: 170px;
       }
     }
   </style>
@@ -670,7 +800,36 @@
           info.appendChild(linksRow);
           card.appendChild(info);
 
-          // Right column: Flavor card
+          // Middle column: 4-Day Upcoming Flavor Calendar
+          const calendarBox = createSafeElement('div', 'card-calendar');
+          const calHeader = createSafeElement('div', 'calendar-header');
+          const calTitle = createSafeElement('div', 'calendar-title', 'Next 4 Days');
+          calHeader.appendChild(calTitle);
+          if (meta.slug) {
+            const calMore = createSafeElement('a', 'calendar-link-more', 'Full Month →');
+            calMore.href = `https://www.culvers.com/restaurants/${encodeURIComponent(meta.slug)}#view-calendar`;
+            calMore.target = '_blank';
+            calMore.rel = 'noopener noreferrer';
+            calHeader.appendChild(calMore);
+          }
+          calendarBox.appendChild(calHeader);
+
+          // Skeletons while loading
+          const skelGrid = createSafeElement('div', 'upcoming-grid');
+          for (let i = 0; i < 4; i++) {
+            const skelItem = createSafeElement('div', 'upcoming-skeleton-item');
+            skelGrid.appendChild(skelItem);
+          }
+          calendarBox.appendChild(skelGrid);
+          card.appendChild(calendarBox);
+
+          if (meta.slug) {
+            loadUpcomingCalendar(meta.slug, calendarBox);
+          } else {
+            calendarBox.style.display = 'none';
+          }
+
+          // Right column: Flavor card (Today's Hero Flavor)
           const flavorCard = createSafeElement('a', 'card-flavor');
           if (meta.slug) {
             flavorCard.href = `https://www.culvers.com/restaurants/${encodeURIComponent(meta.slug)}#view-calendar`;
@@ -678,7 +837,7 @@
             flavorCard.rel = 'noopener noreferrer';
           }
 
-          const flavorBadge = createSafeElement('span', 'flavor-badge', 'Flavor of the Day');
+          const flavorBadge = createSafeElement('span', 'flavor-badge', 'Today\'s Flavor');
           flavorCard.appendChild(flavorBadge);
 
           const imgWrapper = createSafeElement('div', 'flavor-img-wrapper');
@@ -686,8 +845,8 @@
           img.className = 'flavor-img';
           img.loading = 'lazy';
           img.alt = meta.flavorOfDayName || 'Flavor of the Day';
-          img.width = 110;
-          img.height = 110;
+          img.width = 160;
+          img.height = 150;
           img.src = meta.flavorOfDaySlug
             ? `https://cdn.culvers.com/menu-item-detail/${encodeURIComponent(meta.flavorOfDaySlug)}`
             : '/ice-cream.svg';
@@ -710,6 +869,79 @@
         });
 
         container.appendChild(fragment);
+      }
+
+      const calendarCache = new Map();
+
+      async function loadUpcomingCalendar(slug, containerEl) {
+        if (!slug || !containerEl) return;
+        if (calendarCache.has(slug)) {
+          renderUpcomingFlavors(calendarCache.get(slug), containerEl, slug);
+          return;
+        }
+
+        try {
+          const res = await fetch(`/api/calendar?slug=${encodeURIComponent(slug)}`);
+          if (!res.ok) throw new Error('Calendar fetch failed');
+          const data = await res.json();
+          const upcoming = data.upcoming || [];
+          calendarCache.set(slug, upcoming);
+          renderUpcomingFlavors(upcoming, containerEl, slug);
+        } catch (e) {
+          containerEl.style.display = 'none';
+        }
+      }
+
+      function renderUpcomingFlavors(upcomingList, containerEl, slug) {
+        if (!upcomingList || upcomingList.length === 0) {
+          containerEl.style.display = 'none';
+          return;
+        }
+
+        containerEl.innerHTML = '';
+        const headerRow = createSafeElement('div', 'calendar-header');
+        const title = createSafeElement('div', 'calendar-title', 'Next 4 Days');
+        const moreLink = createSafeElement('a', 'calendar-link-more', 'Full Month →');
+        moreLink.href = `https://www.culvers.com/restaurants/${encodeURIComponent(slug)}#view-calendar`;
+        moreLink.target = '_blank';
+        moreLink.rel = 'noopener noreferrer';
+        headerRow.appendChild(title);
+        headerRow.appendChild(moreLink);
+        containerEl.appendChild(headerRow);
+
+        const grid = createSafeElement('div', 'upcoming-grid');
+        upcomingList.forEach(item => {
+          const dayCard = createSafeElement('a', 'upcoming-day-card');
+          dayCard.href = `https://www.culvers.com/restaurants/${encodeURIComponent(slug)}#view-calendar`;
+          dayCard.target = '_blank';
+          dayCard.rel = 'noopener noreferrer';
+          dayCard.title = `${item.dayName} ${item.dateFormatted}: ${item.title}`;
+
+          const datePill = createSafeElement('div', 'upcoming-date-pill', `${item.dayName} ${item.dateFormatted}`);
+          dayCard.appendChild(datePill);
+
+          const imgWrap = createSafeElement('div', 'upcoming-img-wrapper');
+          const img = document.createElement('img');
+          img.className = 'upcoming-img';
+          img.loading = 'lazy';
+          img.alt = item.title;
+          img.width = 44;
+          img.height = 44;
+          img.src = item.image || '/ice-cream.svg';
+          img.onerror = function () {
+            this.onerror = null;
+            this.src = '/ice-cream.svg';
+          };
+          imgWrap.appendChild(img);
+          dayCard.appendChild(imgWrap);
+
+          const nameEl = createSafeElement('div', 'upcoming-flavor-name', item.title);
+          dayCard.appendChild(nameEl);
+
+          grid.appendChild(dayCard);
+        });
+
+        containerEl.appendChild(grid);
       }
 
       async function fetchFlavors(lat, lon, cityName) {

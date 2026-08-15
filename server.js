@@ -8,6 +8,7 @@ import middleware from './middleware.js';
 import fotdHandler from './api/fotd.js';
 import geoHandler from './api/geo.js';
 import proxyHandler from './api/proxy.js';
+import calendarHandler from './api/calendar.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,6 +78,14 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === '/api/proxy') {
     const apiRes = await proxyHandler(webRequest);
+    res.writeHead(apiRes.status, Object.fromEntries(apiRes.headers.entries()));
+    const body = await apiRes.text();
+    res.end(body);
+    return;
+  }
+
+  if (url.pathname === '/api/calendar') {
+    const apiRes = await calendarHandler(webRequest);
     res.writeHead(apiRes.status, Object.fromEntries(apiRes.headers.entries()));
     const body = await apiRes.text();
     res.end(body);

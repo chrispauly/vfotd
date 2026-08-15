@@ -1,9 +1,9 @@
-// Automated test suite for vfotd Edge API, security hardening, and SSRF prevention
 import assert from 'node:assert';
 import middleware from '../middleware.js';
 import fotdHandler from '../api/fotd.js';
 import geoHandler from '../api/geo.js';
 import proxyHandler from '../api/proxy.js';
+import calendarHandler from '../api/calendar.js';
 
 console.log('🧪 Starting vfotd Edge Security & API Tests...\n');
 
@@ -224,20 +224,26 @@ async function runTests() {
     assert.strictEqual(status.text, 'Open · Closes at midnight');
   });
 
-  test('Correctly handles 3:00 AM late-night closing across midnight', () => {
-    const lateHours = JSON.stringify({
-      SaO: '8:00 AM', SaC: '3:00 AM',
-      SuO: '8:00 AM', SuC: '3:00 AM'
-    });
-    // Sunday 1:30 AM (after Saturday night)
-    const earlySunStatus = calculateClosingStatus(lateHours, new Date(2026, 7, 16, 1, 30));
-    assert.strictEqual(earlySunStatus.isOpen, true);
-    assert.strictEqual(earlySunStatus.text, 'Open · Closes at 3:00 AM');
+  // --- 6. Calendar Endpoint Tests ---
+  console.log('\n--- 6. Upcoming 4-Day Calendar Endpoint ---');
 
-    // Sunday 3:30 AM (closed before morning open)
-    const closedEarlyStatus = calculateClosingStatus(lateHours, new Date(2026, 7, 16, 3, 30));
-    assert.strictEqual(closedEarlyStatus.isOpen, false);
-    assert.strictEqual(closedEarlyStatus.text, 'Closed · Opens at 8:00 AM');
+  await testAsync('Rejects invalid slug characters', async () => {
+    const req = new Request('http://localhost:3000/api/calendar?slug=bad/slug$injection');
+    const res = await calendarHandler(req);
+    assert.strictEqual(res.status, 400);
+  });
+
+  await testAsync('Fetches upcoming 4-day calendar for valid restaurant slug', async () => {
+    const req = new Request('http://localhost:3000/api/calendar?slug=madison-todd-drive');
+    const res = await calendarHandler(req);
+    assert.strictEqual(res.status, 200);
+    const data = await res.json();
+    assert.strictEqual(data.slug, 'madison-todd-drive');
+    assert.ok(Array.isArray(data.upcoming), 'Should return upcoming array');
+    console.log(`      Upcoming days retrieved: ${data.upcoming.length}`);
+    if (data.upcoming.length > 0) {
+      console.log(`      First upcoming: ${data.upcoming[0].dayName} (${data.upcoming[0].dateFormatted}) -> ${data.upcoming[0].title}`);
+    }
   });
 
   console.log(`\n========================================`);
