@@ -1,0 +1,21 @@
+{
+  "name": "vfotd",
+  "version": "2.0.0",
+  "description": "Fast Culver's Flavor of the Day tracker built for Vercel Edge",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node test/test-api.js"
+  },
+  "keywords": [
+    "culvers",
+    "flavor-of-the-day",
+    "vercel",
+    "edge-functions",
+    "geolocation"
+  ],
+  "author": "Chris Pauly",
+  "license": "MIT"
+}

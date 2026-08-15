@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culver's Flavor of the Day</title>
+  <meta name="description" content="Find the fresh Culver's Flavor of the Day near you instantly with real-time hours, directions, and flavor calendar.">
+  <meta name="theme-color" content="#005696">
+
+  <!-- Preconnect to image CDN and fonts -->
+  <link rel="preconnect" href="https://cdn.culvers.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Favicons and Manifest -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <style>
+    :root {
+      --culvers-blue: #005696;
+      --culvers-blue-dark: #003e6d;
+      --culvers-blue-light: #0d71bf;
+      --culvers-accent: #f8be14;
+      --culvers-accent-hover: #e5ab07;
+      --bg-gradient: linear-gradient(135deg, #0b2239 0%, #005696 100%);
+      --surface-bg: #ffffff;
+      --surface-subtle: #f8fafc;
+      --surface-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --success-bg: #ecfdf5;
+      --success-text: #059669;
+      --closed-bg: #fef2f2;
+      --closed-text: #dc2626;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(0, 86, 150, 0.12), 0 8px 10px -6px rgba(0, 86, 150, 0.08);
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface-bg: #1e293b;
+        --surface-subtle: #0f172a;
+        --surface-border: #334155;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-light: #64748b;
+        --success-bg: #064e3b;
+        --success-text: #6ee7b7;
+        --closed-bg: #7f1d1d;
+        --closed-text: #fca5a5;
+      }
+      body {
+        background-color: #0b1320;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background-color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header Banner */
+    header {
+      background: var(--bg-gradient);
+      color: #ffffff;
+      padding: 2.25rem 1.25rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .header-container {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.85rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #ffffff;
+    }
+
+    .brand-title span {
+      color: var(--culvers-accent);
+    }
+
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-full);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .refresh-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .refresh-btn svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.4s ease;
+    }
+
+    .refresh-btn.spinning svg {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .location-banner {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 500;
+    }
+
+    .location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(0, 0, 0, 0.22);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      color: var(--culvers-accent);
+    }
+
+    .status-meta {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    /* Main Content Container */
+    main {
+      max-width: 980px;
+      width: 100%;
+      margin: -1.75rem auto 2.5rem;
+      padding: 0 1.25rem;
+      flex: 1;
+    }
+
+    /* Location Cards Grid */
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.25rem;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      border-color: rgba(0, 86, 150, 0.35);
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.55rem;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .status-pill.open {
+      background-color: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .status-pill.closed {
+      background-color: var(--closed-bg);
+      color: var(--closed-text);
+    }
+
+    .card-address {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.35rem;
+      line-height: 1.4;
+    }
+
+    .card-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--culvers-blue);
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-md);
+      background-color: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      transition: var(--transition);
+    }
+
+    .action-link:hover {
+      background-color: var(--culvers-blue);
+      color: #ffffff;
+      border-color: var(--culvers-blue);
+    }
+
+    /* Flavor of the Day Display */
+    .card-flavor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      min-width: 155px;
+      max-width: 175px;
+      transition: var(--transition);
+    }
+
+    .card-flavor:hover {
+      background: rgba(0, 86, 150, 0.05);
+      border-color: var(--culvers-blue-light);
+    }
+
+    .flavor-badge {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--culvers-blue);
+      margin-bottom: 0.35rem;
+    }
+
+    .flavor-img-wrapper {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: rgba(0, 86, 150, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    .flavor-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card-flavor:hover .flavor-img {
+      transform: scale(1.08);
+    }
+
+    .flavor-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.25;
+    }
+
+    /* Skeletons */
+    .skeleton-card {
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    .skeleton-line {
+      height: 16px;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* State messages */
+    .empty-state {
+      background: var(--surface-bg);
+      border: 1px dashed var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding: 1.5rem;
+      margin-top: auto;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+      .card-flavor {
+        max-width: 100%;
+        width: 100%;
+        flex-direction: row;
+        text-align: left;
+        gap: 1rem;
+        align-items: center;
+      }
+      .flavor-img-wrapper {
+        width: 75px;
+        height: 75px;
+        min-width: 75px;
+        margin-bottom: 0;
+      }
+      .flavor-details {
+        display: flex;
+        flex-direction: column;
+      }
+      .skeleton-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="brand-row">
+        <h1 class="brand-title">
+          Culver's <span>Flavor of the Day</span>
+        </h1>
+        <button id="refresh-btn" class="refresh-btn" aria-label="Refresh locations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+      <div class="location-banner">
+        <span>Near:</span>
+        <div id="heading-location" class="location-badge">Detecting location...</div>
+      </div>
+      <div id="fetch-time" class="status-meta"></div>
+    </div>
+  </header>
+
+  <main>
+    <div id="cards-container" class="grid" role="region" aria-live="polite">
+      <!-- Skeletons -->
+      <div class="skeleton-card">
+        <div>
+          <div class="skeleton-line" style="width: 60%; height: 24px;"></div>
+          <div class="skeleton-line" style="width: 40%; margin-top: 10px;"></div>
+          <div class="skeleton-line" style="width: 80%;"></div>
+        </div>
+        <div class="skeleton-circle"></div>
+      </div>
+      <div class="skeleton-card">
+        <div>
+          <div class="skeleton-line" style="width: 55%; height: 24px;"></div>
+          <div class="skeleton-line" style="width: 35%; margin-top: 10px;"></div>
+          <div class="skeleton-line" style="width: 75%;"></div>
+        </div>
+        <div class="skeleton-circle"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Powered by Culver's Locator API · Built for Vercel Edge</p>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const CACHE_KEY = 'vfotd_last_location';
+      const container = document.getElementById('cards-container');
+      const locationBadge = document.getElementById('heading-location');
+      const fetchTimeEl = document.getElementById('fetch-time');
+      const refreshBtn = document.getElementById('refresh-btn');
+
+      function calculateClosingStatus(hoursString) {
+        if (!hoursString) return { text: '', isOpen: false };
+
+        const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        const now = new Date();
+        const dayKey = dayNames[now.getDay()] + 'C';
+
+        let hoursObj = {};
+        try {
+          hoursObj = typeof hoursString === 'string' ? JSON.parse(hoursString) : hoursString;
+        } catch {
+          return { text: '', isOpen: false };
+        }
+
+        const closeTimeRaw = hoursObj[dayKey];
+        if (!closeTimeRaw) return { text: '', isOpen: false };
+
+        const match = /^(?<hr>\d{1,2}):(?<min>\d{1,2})\s*(?<ampm>AM|PM)$/i.exec(closeTimeRaw);
+        if (!match) return { text: `Closes at ${closeTimeRaw}`, isOpen: true };
+
+        let closeHour = parseInt(match.groups.hr, 10);
+        if (match.groups.ampm.toUpperCase() === 'PM' && closeHour !== 12) closeHour += 12;
+        if (match.groups.ampm.toUpperCase() === 'AM' && closeHour === 12) closeHour = 0;
+        const closeMin = parseInt(match.groups.min, 10);
+
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const closeMinutes = closeHour * 60 + closeMin;
+
+        if (currentMinutes >= closeMinutes) {
+          return { text: `Closed today at ${closeTimeRaw}`, isOpen: false };
+        }
+
+        return { text: `Open · Closes at ${closeTimeRaw}`, isOpen: true };
+      }
+
+      function createSafeElement(tag, className, textContent) {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        if (textContent) el.textContent = textContent;
+        return el;
+      }
+
+      function renderLocations(locations, cityName) {
+        if (cityName) {
+          locationBadge.textContent = cityName;
+        }
+
+        container.innerHTML = '';
+
+        const validLocations = (locations || []).filter(loc => loc?.metadata?.flavorOfDayName);
+
+        if (validLocations.length === 0) {
+          const emptyDiv = createSafeElement('div', 'empty-state');
+          const title = createSafeElement('h3', '', 'No Flavors Found Nearby');
+          const msg = createSafeElement('p', '', 'No Culver\'s locations with active daily flavors were found within range.');
+          emptyDiv.appendChild(title);
+          emptyDiv.appendChild(msg);
+          container.appendChild(emptyDiv);
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        validLocations.forEach(loc => {
+          const meta = loc.metadata || {};
+          const card = createSafeElement('div', 'card');
+
+          // Left column: Info
+          const info = createSafeElement('div', 'card-info');
+
+          // Title & Hours
+          const titleRow = createSafeElement('div', 'card-title');
+          const nameSpan = createSafeElement('span', '', loc.description || meta.name || 'Culver\'s');
+          titleRow.appendChild(nameSpan);
+
+          const hoursStatus = calculateClosingStatus(meta.driveThruHours || meta.dineInHours);
+          if (hoursStatus.text) {
+            const pill = createSafeElement(
+              'span',
+              `status-pill ${hoursStatus.isOpen ? 'open' : 'closed'}`,
+              hoursStatus.text
+            );
+            titleRow.appendChild(pill);
+          }
+          info.appendChild(titleRow);
+
+          // Address
+          const addressParts = [meta.street, meta.city, meta.state, meta.postalCode].filter(Boolean);
+          const fullAddress = addressParts.join(', ');
+          const addrRow = createSafeElement('div', 'card-address', fullAddress);
+          info.appendChild(addrRow);
+
+          // Action links
+          const linksRow = createSafeElement('div', 'card-links');
+
+          const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`;
+          const directionsLink = createSafeElement('a', 'action-link', 'Directions');
+          directionsLink.href = mapsUrl;
+          directionsLink.target = '_blank';
+          directionsLink.rel = 'noopener noreferrer';
+          linksRow.appendChild(directionsLink);
+
+          if (meta.slug) {
+            const calendarUrl = `https://www.culvers.com/restaurants/${encodeURIComponent(meta.slug)}#view-calendar`;
+            const calLink = createSafeElement('a', 'action-link', 'Flavor Calendar');
+            calLink.href = calendarUrl;
+            calLink.target = '_blank';
+            calLink.rel = 'noopener noreferrer';
+            linksRow.appendChild(calLink);
+          }
+
+          info.appendChild(linksRow);
+          card.appendChild(info);
+
+          // Right column: Flavor card
+          const flavorCard = createSafeElement('a', 'card-flavor');
+          if (meta.slug) {
+            flavorCard.href = `https://www.culvers.com/restaurants/${encodeURIComponent(meta.slug)}#view-calendar`;
+            flavorCard.target = '_blank';
+            flavorCard.rel = 'noopener noreferrer';
+          }
+
+          const flavorBadge = createSafeElement('span', 'flavor-badge', 'Flavor of the Day');
+          flavorCard.appendChild(flavorBadge);
+
+          const imgWrapper = createSafeElement('div', 'flavor-img-wrapper');
+          const img = document.createElement('img');
+          img.className = 'flavor-img';
+          img.loading = 'lazy';
+          img.alt = meta.flavorOfDayName || 'Flavor of the Day';
+          img.width = 110;
+          img.height = 110;
+          img.src = meta.flavorOfDaySlug
+            ? `https://cdn.culvers.com/menu-item-detail/${encodeURIComponent(meta.flavorOfDaySlug)}`
+            : '/NBHead.png';
+
+          img.onerror = function () {
+            this.src = '/NBHead.png';
+          };
+
+          imgWrapper.appendChild(img);
+          flavorCard.appendChild(imgWrapper);
+
+          const flavorDetails = createSafeElement('div', 'flavor-details');
+          const flavorName = createSafeElement('div', 'flavor-name', meta.flavorOfDayName);
+          flavorDetails.appendChild(flavorName);
+          flavorCard.appendChild(flavorDetails);
+
+          card.appendChild(flavorCard);
+          fragment.appendChild(card);
+        });
+
+        container.appendChild(fragment);
+      }
+
+      async function fetchFlavors(lat, lon, cityName) {
+        refreshBtn.classList.add('spinning');
+        try {
+          const res = await fetch(`/api/fotd?lat=${lat}&lon=${lon}`);
+          if (!res.ok) throw new Error(`API error (${res.status})`);
+
+          const data = await res.json();
+          const geofences = data?.data?.geofences || [];
+
+          renderLocations(geofences, cityName);
+          fetchTimeEl.textContent = `Updated: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+          // Save to local storage cache for instant next load
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ lat, lon, cityName, timestamp: Date.now() }));
+          } catch {}
+
+          return true;
+        } catch (err) {
+          console.error('Fetch error:', err);
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>Unable to Load Flavors</h3>
+              <p>Please check your connection and try again.</p>
+            </div>
+          `;
+          return false;
+        } finally {
+          refreshBtn.classList.remove('spinning');
+        }
+      }
+
+      async function reverseGeocode(lat, lon) {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+          if (!res.ok) return null;
+          const data = await res.json();
+          const addr = data.address || {};
+          return addr.city || addr.town || addr.village || addr.county || null;
+        } catch {
+          return null;
+        }
+      }
+
+      async function initializeLocation() {
+        // Step 1: Check cached location for instant paint
+        let cached = null;
+        try {
+          const raw = localStorage.getItem(CACHE_KEY);
+          if (raw) cached = JSON.parse(raw);
+        } catch {}
+
+        if (cached && cached.lat && cached.lon) {
+          locationBadge.textContent = cached.cityName || 'Your Location';
+          fetchFlavors(cached.lat, cached.lon, cached.cityName);
+        }
+
+        // Step 2: In parallel, inspect Edge Geo if cached is missing
+        if (!cached) {
+          try {
+            const geoRes = await fetch('/api/geo');
+            if (geoRes.ok) {
+              const geoData = await geoRes.json();
+              if (geoData.hasGeo && geoData.latitude && geoData.longitude) {
+                const edgeCity = geoData.city ? `${geoData.city}, ${geoData.region || ''}` : 'Your Area';
+                locationBadge.textContent = edgeCity;
+                fetchFlavors(geoData.latitude, geoData.longitude, edgeCity);
+              }
+            }
+          } catch {}
+        }
+
+        // Step 3: Prompt for high-accuracy browser geolocation
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              const cityName = (await reverseGeocode(lat, lon)) || 'Current Location';
+
+              // Only re-fetch if location differs significantly from cache
+              if (!cached || Math.abs(cached.lat - lat) > 0.02 || Math.abs(cached.lon - lon) > 0.02) {
+                fetchFlavors(lat, lon, cityName);
+              }
+            },
+            (err) => {
+              if (!cached) {
+                locationBadge.textContent = 'Location Disabled';
+                container.innerHTML = `
+                  <div class="empty-state">
+                    <h3>Location Access Required</h3>
+                    <p>Please allow location permissions to find your nearest Culver's Flavors.</p>
+                  </div>
+                `;
+              }
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+          );
+        }
+      }
+
+      // Refresh button
+      refreshBtn.addEventListener('click', () => {
+        let cached = null;
+        try {
+          const raw = localStorage.getItem(CACHE_KEY);
+          if (raw) cached = JSON.parse(raw);
+        } catch {}
+
+        if (cached?.lat && cached?.lon) {
+          fetchFlavors(cached.lat, cached.lon, cached.cityName);
+        } else {
+          initializeLocation();
+        }
+      });
+
+      // Auto-schedule refresh at next 6:00 AM (Culver's flavor switch time)
+      function scheduleNextFlavorRefresh() {
+        const now = new Date();
+        const next6am = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (now.getHours() >= 6 ? 1 : 0), 6, 1, 0);
+        const msUntil6am = next6am.getTime() - Date.now();
+        setTimeout(() => {
+          window.location.reload();
+        }, Math.max(1000, msUntil6am));
+      }
+
+      initializeLocation();
+      scheduleNextFlavorRefresh();
+    })();
+  </script>
+</body>
+</html>
