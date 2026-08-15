@@ -48,7 +48,6 @@ const server = http.createServer(async (req, res) => {
     method: req.method,
     headers: webHeaders
   });
-  webRequest.nextUrl = url;
 
   // Run Edge Middleware
   const middlewareRes = middleware(webRequest);

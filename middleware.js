@@ -46,8 +46,10 @@ function isAllowedOrigin(request) {
 }
 
 export default function middleware(request) {
+  const url = new URL(request.url);
+
   // Enforce origin restrictions on API calls
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/api/')) {
     // Handle CORS preflight if ever called
     if (request.method === 'OPTIONS') {
       const host = request.headers.get('host') || '';

@@ -43,7 +43,6 @@ async function runTests() {
         'sec-fetch-site': 'cross-site'
       }
     });
-    req.nextUrl = new URL(req.url);
     const res = middleware(req);
     assert.strictEqual(res.status, 403, 'Should return 403 for cross-site requests');
   });
@@ -55,7 +54,6 @@ async function runTests() {
         'origin': 'https://evil-attacker-site.com'
       }
     });
-    req.nextUrl = new URL(req.url);
     const res = middleware(req);
     assert.strictEqual(res.status, 403, 'Should return 403 for mismatched origin');
   });
@@ -68,7 +66,6 @@ async function runTests() {
         'sec-fetch-site': 'same-origin'
       }
     });
-    req.nextUrl = new URL(req.url);
     const res = middleware(req);
     assert.strictEqual(res, undefined, 'Should pass through middleware (undefined)');
   });
@@ -78,7 +75,6 @@ async function runTests() {
       method: 'POST',
       headers: { 'host': 'localhost:3000' }
     });
-    req.nextUrl = new URL(req.url);
     const res = middleware(req);
     assert.strictEqual(res.status, 405, 'Should return 405 Method Not Allowed');
   });
