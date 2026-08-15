@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Culver's Flavor of the Day</title>
+  <title>Flavor of the Day</title>
   <meta name="description" content="Find the fresh Culver's Flavor of the Day near you instantly with real-time hours, directions, and flavor calendar.">
   <meta name="theme-color" content="#005696">
 
@@ -80,11 +80,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Header Banner */
+    /* Header Banner - Compact & Streamlined */
     header {
       background: var(--bg-gradient);
       color: #ffffff;
-      padding: 2.25rem 1.25rem 3.5rem;
+      padding: 1.15rem 1.25rem 1.75rem;
       position: relative;
       overflow: hidden;
       box-shadow: var(--shadow-md);
@@ -93,11 +93,11 @@
     header::after {
       content: '';
       position: absolute;
-      top: -50%;
+      top: -60%;
       right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -107,7 +107,7 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.45rem;
     }
 
     .brand-row {
@@ -120,16 +120,17 @@
     .brand-title {
       font-family: 'Outfit', sans-serif;
       font-weight: 800;
-      font-size: 1.85rem;
+      font-size: 1.45rem;
       letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
       color: #ffffff;
     }
 
-    .brand-title span {
-      color: var(--culvers-accent);
+    .sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
 
     .refresh-btn {
@@ -141,8 +142,8 @@
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: var(--radius-full);
-      padding: 0.45rem 0.9rem;
-      font-size: 0.82rem;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
@@ -154,8 +155,8 @@
     }
 
     .refresh-btn svg {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       transition: transform 0.4s ease;
     }
 
@@ -170,8 +171,8 @@
     .location-banner {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
+      gap: 0.45rem;
+      font-size: 0.92rem;
       color: rgba(255, 255, 255, 0.92);
       font-weight: 500;
     }
@@ -181,22 +182,23 @@
       align-items: center;
       gap: 0.35rem;
       background: rgba(0, 0, 0, 0.22);
-      padding: 0.2rem 0.65rem;
+      padding: 0.15rem 0.55rem;
       border-radius: var(--radius-full);
       font-weight: 700;
       color: var(--culvers-accent);
+      font-size: 0.88rem;
     }
 
     .status-meta {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.7);
     }
 
     /* Main Content Container */
     main {
       max-width: 980px;
       width: 100%;
-      margin: -1.75rem auto 2.5rem;
+      margin: -0.75rem auto 2.5rem;
       padding: 0 1.25rem;
       flex: 1;
     }
@@ -466,9 +468,7 @@
   <header>
     <div class="header-container">
       <div class="brand-row">
-        <h1 class="brand-title">
-          Culver's <span>Flavor of the Day</span>
-        </h1>
+        <h1 class="brand-title">Flavor of the Day</h1>
         <button id="refresh-btn" class="refresh-btn" aria-label="Refresh locations">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
@@ -476,11 +476,13 @@
           <span>Refresh</span>
         </button>
       </div>
-      <div class="location-banner">
-        <span>Near:</span>
-        <div id="heading-location" class="location-badge">Detecting location...</div>
+      <div class="sub-row">
+        <div class="location-banner">
+          <span>Near:</span>
+          <div id="heading-location" class="location-badge">Detecting location...</div>
+        </div>
+        <div id="fetch-time" class="status-meta"></div>
       </div>
-      <div id="fetch-time" class="status-meta"></div>
     </div>
   </header>
 
