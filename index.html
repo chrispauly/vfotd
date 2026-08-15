@@ -679,10 +679,11 @@
           img.height = 110;
           img.src = meta.flavorOfDaySlug
             ? `https://cdn.culvers.com/menu-item-detail/${encodeURIComponent(meta.flavorOfDaySlug)}`
-            : '/NBHead.png';
+            : '/ice-cream.svg';
 
           img.onerror = function () {
-            this.src = '/NBHead.png';
+            this.onerror = null;
+            this.src = '/ice-cream.svg';
           };
 
           imgWrapper.appendChild(img);

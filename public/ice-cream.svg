@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="#005696" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Custard / Ice Cream Bowl -->
+  <path d="M14 36 C14 48 22 54 32 54 C42 54 50 48 50 36 Z" fill="#f1f5f9"/>
+  <!-- Base stem & foot -->
+  <path d="M32 54 L32 60"/>
+  <path d="M24 60 L40 60"/>
+  <!-- Custard Swirl -->
+  <path d="M16 36 C14 30 18 24 24 24 C25 20 28 16 32 16 C36 16 39 20 40 24 C46 24 50 30 48 36 Z" fill="#e2e8f0"/>
+  <path d="M26 24 C28 18 36 18 38 24"/>
+  <path d="M32 16 C32 10 34 8 36 8" stroke-dasharray="1 2"/>
+</svg>
