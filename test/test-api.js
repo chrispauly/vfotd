@@ -153,6 +153,93 @@ async function runTests() {
     assert.strictEqual(data.hasGeo, true);
   });
 
+  // --- 5. Hours & Midnight Status Tests ---
+  console.log('\n--- 5. Closing Hours & Midnight Calculation ---');
+
+  function parseTimeToMinutes(timeStr) {
+    if (!timeStr) return null;
+    const match = /^(?<hr>\d{1,2}):(?<min>\d{1,2})\s*(?<ampm>AM|PM)$/i.exec(timeStr.trim());
+    if (!match) return null;
+    let hr = parseInt(match.groups.hr, 10);
+    const min = parseInt(match.groups.min, 10);
+    const isPM = match.groups.ampm.toUpperCase() === 'PM';
+    if (isPM && hr !== 12) hr += 12;
+    if (!isPM && hr === 12) hr = 0;
+    return hr * 60 + min;
+  }
+
+  function calculateClosingStatus(hoursString, mockDate = new Date()) {
+    if (!hoursString) return { text: '', isOpen: false };
+    let hoursObj = typeof hoursString === 'string' ? JSON.parse(hoursString) : hoursString;
+    const dayPrefixes = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const todayIdx = mockDate.getDay();
+    const yestIdx = (todayIdx + 6) % 7;
+
+    const todayKey = dayPrefixes[todayIdx];
+    const yestKey = dayPrefixes[yestIdx];
+
+    const todayOpenRaw = hoursObj[todayKey + 'O'] || '10:00 AM';
+    const todayCloseRaw = hoursObj[todayKey + 'C'];
+    const yestOpenRaw = hoursObj[yestKey + 'O'] || '10:00 AM';
+    const yestCloseRaw = hoursObj[yestKey + 'C'];
+
+    if (!todayCloseRaw) return { text: '', isOpen: false };
+
+    const todayOpenMins = parseTimeToMinutes(todayOpenRaw) ?? 600;
+    const todayCloseMins = parseTimeToMinutes(todayCloseRaw) ?? 1320;
+    const yestOpenMins = parseTimeToMinutes(yestOpenRaw) ?? 600;
+    const yestCloseMins = parseTimeToMinutes(yestCloseRaw) ?? 1320;
+
+    const nowMins = mockDate.getHours() * 60 + mockDate.getMinutes();
+
+    const yestCrossesMidnight = yestCloseMins <= yestOpenMins;
+    if (yestCrossesMidnight && nowMins < yestCloseMins) {
+      const formattedClose = yestCloseRaw === '12:00 AM' ? 'midnight' : yestCloseRaw;
+      return { text: `Open · Closes at ${formattedClose}`, isOpen: true };
+    }
+
+    if (nowMins < todayOpenMins) {
+      return { text: `Closed · Opens at ${todayOpenRaw}`, isOpen: false };
+    }
+
+    const todayCrossesMidnight = todayCloseMins <= todayOpenMins;
+    const effectiveCloseMins = todayCrossesMidnight ? todayCloseMins + 1440 : todayCloseMins;
+
+    if (nowMins < effectiveCloseMins) {
+      const formattedClose = todayCloseRaw === '12:00 AM' ? 'midnight' : todayCloseRaw;
+      return { text: `Open · Closes at ${formattedClose}`, isOpen: true };
+    }
+
+    const formattedClose = todayCloseRaw === '12:00 AM' ? 'midnight' : todayCloseRaw;
+    return { text: `Closed today at ${formattedClose}`, isOpen: false };
+  }
+
+  test('Correctly shows Open at 4:15 PM when closing time is 12:00 AM midnight', () => {
+    const midnightHours = JSON.stringify({
+      SaO: '10:00 AM', SaC: '12:00 AM',
+      SuO: '10:00 AM', SuC: '12:00 AM'
+    });
+    const status = calculateClosingStatus(midnightHours, new Date(2026, 7, 15, 16, 15));
+    assert.strictEqual(status.isOpen, true);
+    assert.strictEqual(status.text, 'Open · Closes at midnight');
+  });
+
+  test('Correctly handles 3:00 AM late-night closing across midnight', () => {
+    const lateHours = JSON.stringify({
+      SaO: '8:00 AM', SaC: '3:00 AM',
+      SuO: '8:00 AM', SuC: '3:00 AM'
+    });
+    // Sunday 1:30 AM (after Saturday night)
+    const earlySunStatus = calculateClosingStatus(lateHours, new Date(2026, 7, 16, 1, 30));
+    assert.strictEqual(earlySunStatus.isOpen, true);
+    assert.strictEqual(earlySunStatus.text, 'Open · Closes at 3:00 AM');
+
+    // Sunday 3:30 AM (closed before morning open)
+    const closedEarlyStatus = calculateClosingStatus(lateHours, new Date(2026, 7, 16, 3, 30));
+    assert.strictEqual(closedEarlyStatus.isOpen, false);
+    assert.strictEqual(closedEarlyStatus.text, 'Closed · Opens at 8:00 AM');
+  });
+
   console.log(`\n========================================`);
   console.log(`Tests finished: ${passed}/${total} passed`);
   console.log(`========================================\n`);
