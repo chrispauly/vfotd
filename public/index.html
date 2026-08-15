@@ -205,18 +205,18 @@
     .grid {
       display: flex;
       flex-direction: column;
-      gap: 1.15rem;
+      gap: 1.4rem;
     }
 
     .card {
       background: var(--surface-bg);
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-lg);
-      padding: 1.35rem;
+      padding: 1.4rem;
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1.25rem;
-      align-items: center;
+      grid-template-columns: 1fr 270px;
+      gap: 1.6rem;
+      align-items: stretch;
       box-shadow: var(--shadow-sm);
       transition: var(--transition);
       position: relative;
@@ -225,18 +225,19 @@
     .card:hover {
       box-shadow: var(--shadow-lg);
       transform: translateY(-2px);
-      border-color: rgba(0, 86, 150, 0.35);
+      border-color: rgba(0, 86, 150, 0.4);
     }
 
     .card-info {
       display: flex;
       flex-direction: column;
-      gap: 0.55rem;
+      justify-content: space-between;
+      gap: 0.9rem;
     }
 
     .card-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -248,7 +249,7 @@
     .status-pill {
       font-size: 0.72rem;
       font-weight: 600;
-      padding: 0.15rem 0.55rem;
+      padding: 0.2rem 0.6rem;
       border-radius: var(--radius-full);
       display: inline-flex;
       align-items: center;
@@ -266,30 +267,30 @@
     }
 
     .card-address {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
       display: flex;
       align-items: flex-start;
       gap: 0.35rem;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .card-links {
       display: flex;
       gap: 0.75rem;
       flex-wrap: wrap;
-      margin-top: 0.25rem;
+      margin-top: auto;
     }
 
     .action-link {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      font-size: 0.82rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--culvers-blue);
       text-decoration: none;
-      padding: 0.25rem 0.5rem;
+      padding: 0.35rem 0.7rem;
       border-radius: var(--radius-md);
       background-color: var(--surface-subtle);
       border: 1px solid var(--surface-border);
@@ -302,7 +303,7 @@
       border-color: var(--culvers-blue);
     }
 
-    /* Flavor of the Day Display */
+    /* Flavor of the Day Display - Large Hero Tile */
     .card-flavor {
       display: flex;
       flex-direction: column;
@@ -310,48 +311,58 @@
       text-align: center;
       text-decoration: none;
       color: inherit;
-      background: var(--surface-subtle);
+      background: linear-gradient(180deg, var(--surface-subtle) 0%, rgba(0, 86, 150, 0.05) 100%);
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-md);
-      padding: 0.75rem;
-      min-width: 155px;
-      max-width: 175px;
+      padding: 1.15rem 1rem;
       transition: var(--transition);
+      justify-content: center;
     }
 
     .card-flavor:hover {
-      background: rgba(0, 86, 150, 0.05);
+      background: linear-gradient(180deg, rgba(0, 86, 150, 0.05) 0%, rgba(0, 86, 150, 0.12) 100%);
       border-color: var(--culvers-blue-light);
     }
 
     .flavor-badge {
       font-family: 'Outfit', sans-serif;
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       font-weight: 800;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--culvers-blue);
-      margin-bottom: 0.35rem;
+      color: #ffffff;
+      background: var(--culvers-blue);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 0.75rem;
+      box-shadow: 0 2px 4px rgba(0, 86, 150, 0.18);
     }
 
     .flavor-img-wrapper {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
+      width: 100%;
+      height: 160px;
+      border-radius: var(--radius-md);
       overflow: hidden;
-      background: rgba(0, 86, 150, 0.06);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
       position: relative;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .flavor-img-wrapper {
+        background: rgba(15, 23, 42, 0.5);
+      }
     }
 
     .flavor-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
+      object-fit: contain;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
     }
 
     .card-flavor:hover .flavor-img {
@@ -360,10 +371,10 @@
 
     .flavor-name {
       font-family: 'Outfit', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: var(--text-main);
-      line-height: 1.25;
+      line-height: 1.3;
     }
 
     /* Skeletons */
@@ -371,10 +382,10 @@
       background: var(--surface-bg);
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-lg);
-      padding: 1.35rem;
+      padding: 1.4rem;
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 1.25rem;
+      grid-template-columns: 1fr 270px;
+      gap: 1.6rem;
       align-items: center;
     }
 
@@ -384,13 +395,13 @@
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
       border-radius: 4px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
-    .skeleton-circle {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
+    .skeleton-box {
+      width: 100%;
+      height: 200px;
+      border-radius: var(--radius-md);
       background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
@@ -425,30 +436,28 @@
       margin-top: auto;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 720px) {
       .card {
         grid-template-columns: 1fr;
+        padding: 1.25rem;
+        gap: 1.25rem;
       }
       .card-flavor {
-        max-width: 100%;
         width: 100%;
-        flex-direction: row;
-        text-align: left;
-        gap: 1rem;
-        align-items: center;
+        max-width: 100%;
+        padding: 1.25rem;
       }
       .flavor-img-wrapper {
-        width: 75px;
-        height: 75px;
-        min-width: 75px;
-        margin-bottom: 0;
+        height: 190px;
       }
-      .flavor-details {
-        display: flex;
-        flex-direction: column;
+      .flavor-name {
+        font-size: 1.25rem;
       }
       .skeleton-card {
         grid-template-columns: 1fr;
+      }
+      .skeleton-box {
+        height: 180px;
       }
     }
   </style>
@@ -484,7 +493,7 @@
           <div class="skeleton-line" style="width: 40%; margin-top: 10px;"></div>
           <div class="skeleton-line" style="width: 80%;"></div>
         </div>
-        <div class="skeleton-circle"></div>
+        <div class="skeleton-box"></div>
       </div>
       <div class="skeleton-card">
         <div>
@@ -492,7 +501,7 @@
           <div class="skeleton-line" style="width: 35%; margin-top: 10px;"></div>
           <div class="skeleton-line" style="width: 75%;"></div>
         </div>
-        <div class="skeleton-circle"></div>
+        <div class="skeleton-box"></div>
       </div>
     </div>
   </main>
