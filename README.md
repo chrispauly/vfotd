@@ -1,26 +1,33 @@
-# 🍦 vfotd (Culver's Flavor of the Day)
+# 🍦 vfotd (Flavor of the Day)
 
-A high-performance, ultra-lightweight web application that tracks your nearest Culver's Flavor of the Day in real-time, built specifically for **Vercel Edge Functions & Middleware**.
+A lightning-fast, ultra-lightweight web application that tracks your nearest Culver's Flavor of the Day and the upcoming 4-day flavor calendar in real-time, built specifically for **Vercel Edge Functions & Middleware**.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ---
 
-## ⚡ Features & Performance
+## ⚡ Key Features
 
-- **🚀 Sub-15ms Edge Response**: Culver's location and flavor queries are cached on Vercel's global edge network (`s-maxage=1800, stale-while-revalidate=86400`).
-- **📍 Instant Hydration (Vercel IP-Geo + LocalStorage)**: Automatically detects your general location from Vercel's edge headers for zero-delay initial rendering, followed by background high-accuracy GPS refinement.
-- **🛡️ Locked-Down Proxy & Security Hardening**:
-  - **No Open SSRF**: Strict whitelist ensures only official Culver's locator endpoints can be queried.
+- **🚀 Sub-15ms Edge Response**:
+  - Culver's location and daily flavor queries are cached on Vercel's global edge network (`s-maxage=1800, stale-while-revalidate=86400`).
+  - Restaurant monthly calendar data is edge-cached (`s-maxage=3600, stale-while-revalidate=86400`).
+- **📅 4-Day Upcoming Flavor Calendar**:
+  - Desktop view displays an inline **Next 4 Days** horizontal strip for each location with custom flavor thumbnails and date badges.
+  - Client-side and server-side timezone normalization ensures correct day order regardless of UTC server rollbacks.
+- **📍 Instant Hydration & Mobile GPS**:
+  - Instant paint using `localStorage` cached coordinates and Vercel IP-Geo headers (`x-vercel-ip-latitude`, `x-vercel-ip-longitude`, `x-vercel-ip-city`).
+  - Automatic background high-accuracy GPS refinement (`enableHighAccuracy: true`) on page load.
+  - Real-time location refresh when switching tabs or unlocking phone (`visibilitychange`, `pageshow`).
+  - Sensitive distance threshold (~300m) to immediately re-sort restaurants when driving between nearby areas (e.g. Madison $\rightarrow$ Fitchburg).
+- **🌙 High-Contrast Dark & Light Mode**:
+  - Full support for `prefers-color-scheme: dark` with high-contrast buttons, badges, and dark shimmer skeletons.
+- **🕒 Accurate Store Hours**:
+  - Full support for standard hours, closing at midnight (`12:00 AM`), and post-midnight closing shifts (e.g. `1:00 AM - 3:00 AM`).
+- **🛡️ Edge Security & Locked-Down Proxy**:
+  - **No Open SSRF**: Strict parameter and destination validation restricts queries exclusively to Culver's API.
   - **Site-Restricted Access**: Edge middleware blocks cross-site API abuse (`Sec-Fetch-Site: cross-site`, mismatched `Origin`/`Referer`).
-  - **Input Sanitization**: Numerical coordinate range validation (`-90..90`, `-180..180`).
+  - **Input Sanitization**: Numerical coordinate range validation (`-90..90`, `-180..180`) and restaurant slug format checks.
   - **Content Security Policy (CSP)** & strict HTTP security headers configured in `vercel.json`.
-- **✨ Modern UI & Aesthetics**:
-  - Zero framework runtime overhead (< 25 KB total assets).
-  - Responsive cards with Culver's blue accents, glassmorphism, and dark/light mode support.
-  - Real-time opening/closing status calculation.
-  - One-click Google Maps directions and Flavor Calendar links.
-  - Automatic scheduled 6:00 AM reload when daily flavors rotate.
 
 ---
 
@@ -28,13 +35,15 @@ A high-performance, ultra-lightweight web application that tracks your nearest C
 
 ```
 ├── api/
+│   ├── calendar.js    # Vercel Edge Function for upcoming 4-day flavor calendar
 │   ├── fotd.js        # Vercel Edge Function for Culver's Locator API (with caching)
 │   ├── geo.js         # Vercel Edge Function returning IP-Geo headers
 │   └── proxy.js       # Hardened backward-compatible proxy endpoint
 ├── public/
 │   ├── index.html     # Optimized frontend with vanilla CSS & JS
+│   ├── ice-cream.svg  # Vector fallback for flavor graphics
 │   ├── site.webmanifest
-│   └── *.png, *.ico   # App icons & static branding assets
+│   └── *.png, *.ico   # App icons & favicon assets
 ├── test/
 │   └── test-api.js    # Automated security, input validation & live API tests
 ├── middleware.js      # Edge Middleware (origin restriction, method check)
@@ -45,9 +54,9 @@ A high-performance, ultra-lightweight web application that tracks your nearest C
 
 ---
 
-## 🛠️ Local Development
+## 🛠️ Local Development & Testing
 
-Run the zero-dependency local simulation server:
+Run the zero-dependency local simulation server (runs Edge functions locally):
 
 ```bash
 # Start local dev server at http://localhost:3000
@@ -56,7 +65,7 @@ npm start
 npm run dev
 ```
 
-Run the automated security and API test suite:
+Run the automated test suite (14 automated tests):
 
 ```bash
 npm test
@@ -68,9 +77,7 @@ npm test
 
 1. Push this repository to GitHub as `vfotd`:
    ```bash
-   git remote set-url origin https://github.com/chrispauly/vfotd.git
-   git branch -M main
-   git push -u origin main
+   git push origin main
    ```
 2. Import the `vfotd` repository in the [Vercel Dashboard](https://vercel.com/new).
-3. Vercel will automatically detect the Edge Functions, Middleware, and static assets with zero additional configuration required!
+3. Compatible with **Vercel Free (Hobby)** and Pro plans with zero environment variables or configuration required.
