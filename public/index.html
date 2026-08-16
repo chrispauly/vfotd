@@ -584,15 +584,63 @@
       background: var(--surface-bg);
       border: 1px dashed var(--surface-border);
       border-radius: var(--radius-lg);
-      padding: 3rem 1.5rem;
+      padding: 3.5rem 1.75rem;
       text-align: center;
       color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state-icon {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 0.25rem;
+      opacity: 0.85;
     }
 
     .empty-state h3 {
       font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+      font-size: 0.95rem;
+      max-width: 480px;
+      line-height: 1.5;
+    }
+
+    .empty-search-btn {
+      margin-top: 0.6rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--bg-gradient);
+      text-decoration: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-full);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .empty-search-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      filter: brightness(1.1);
+    }
+
+    .empty-search-btn svg {
+      width: 16px;
+      height: 16px;
     }
 
     footer {
@@ -789,10 +837,43 @@
 
         if (validLocations.length === 0) {
           const emptyDiv = createSafeElement('div', 'empty-state');
-          const title = createSafeElement('h3', '', 'No Flavors Found Nearby');
-          const msg = createSafeElement('p', '', 'No Culver\'s locations with active daily flavors were found within range.');
+
+          const iconImg = document.createElement('img');
+          iconImg.className = 'empty-state-icon';
+          iconImg.src = '/ice-cream.svg';
+          iconImg.alt = 'Ice Cream Cone';
+          emptyDiv.appendChild(iconImg);
+
+          const title = createSafeElement('h3', '', 'No Culver\'s Locations Found Nearby');
+          const msgText = cityName && cityName !== 'Current Location' && cityName !== 'Your Location' && cityName !== 'Your Area'
+            ? `No Culver's locations with active daily flavors were found near ${cityName}.`
+            : 'No Culver\'s locations with active daily flavors were found in your current area.';
+          const msg = createSafeElement('p', '', msgText);
           emptyDiv.appendChild(title);
           emptyDiv.appendChild(msg);
+
+          const searchArea = cityName && cityName !== 'Current Location' && cityName !== 'Your Location' && cityName !== 'Your Area'
+            ? `in ${cityName}`
+            : 'near me';
+          const query = `best custard or ice cream shops ${searchArea}`;
+          const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+
+          const searchBtn = createSafeElement('a', 'empty-search-btn', 'Find Custard & Ice Cream on Google');
+          searchBtn.href = searchUrl;
+          searchBtn.target = '_blank';
+          searchBtn.rel = 'noopener noreferrer';
+
+          const searchIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          searchIcon.setAttribute('viewBox', '0 0 24 24');
+          searchIcon.setAttribute('fill', 'none');
+          searchIcon.setAttribute('stroke', 'currentColor');
+          searchIcon.setAttribute('stroke-width', '2');
+          searchIcon.setAttribute('stroke-linecap', 'round');
+          searchIcon.setAttribute('stroke-linejoin', 'round');
+          searchIcon.innerHTML = '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>';
+          searchBtn.prepend(searchIcon);
+
+          emptyDiv.appendChild(searchBtn);
           container.appendChild(emptyDiv);
           return;
         }
