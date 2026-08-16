@@ -988,6 +988,65 @@
         }
       }
 
+      let lastGpsTimestamp = 0;
+
+      function requestLiveGPS(forceUpdate = false) {
+        if (!navigator.geolocation) return;
+
+        refreshBtn.classList.add('spinning');
+
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            lastGpsTimestamp = Date.now();
+
+            let cached = null;
+            try {
+              const raw = localStorage.getItem(CACHE_KEY);
+              if (raw) cached = JSON.parse(raw);
+            } catch {}
+
+            // Calculate approximate distance moved (0.003 deg is ~300 meters / 0.2 miles)
+            const distanceMoved = cached
+              ? Math.hypot(cached.lat - lat, cached.lon - lon)
+              : 999;
+
+            if (forceUpdate || !cached || distanceMoved > 0.003) {
+              const cityName = (await reverseGeocode(lat, lon)) || 'Current Location';
+              locationBadge.textContent = cityName;
+              await fetchFlavors(lat, lon, cityName);
+            } else {
+              refreshBtn.classList.remove('spinning');
+            }
+          },
+          (err) => {
+            console.warn('Geolocation error:', err.message);
+            refreshBtn.classList.remove('spinning');
+            let cached = null;
+            try {
+              const raw = localStorage.getItem(CACHE_KEY);
+              if (raw) cached = JSON.parse(raw);
+            } catch {}
+
+            if (!cached) {
+              locationBadge.textContent = 'Location Required';
+              container.innerHTML = `
+                <div class="empty-state">
+                  <h3>Location Access Required</h3>
+                  <p>Please enable device location permissions to find your nearest Flavor of the Day.</p>
+                </div>
+              `;
+            }
+          },
+          {
+            enableHighAccuracy: true, // Forces actual GPS hardware on phones
+            timeout: 10000,
+            maximumAge: forceUpdate ? 0 : 30000 // Force fresh position on refresh
+          }
+        );
+      }
+
       async function initializeLocation() {
         // Step 1: Check cached location for instant paint
         let cached = null;
@@ -1016,47 +1075,28 @@
           } catch {}
         }
 
-        // Step 3: Prompt for high-accuracy browser geolocation
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-              const lat = pos.coords.latitude;
-              const lon = pos.coords.longitude;
-              const cityName = (await reverseGeocode(lat, lon)) || 'Current Location';
-
-              // Only re-fetch if location differs significantly from cache
-              if (!cached || Math.abs(cached.lat - lat) > 0.02 || Math.abs(cached.lon - lon) > 0.02) {
-                fetchFlavors(lat, lon, cityName);
-              }
-            },
-            (err) => {
-              if (!cached) {
-                locationBadge.textContent = 'Location Disabled';
-                container.innerHTML = `
-                  <div class="empty-state">
-                    <h3>Location Access Required</h3>
-                    <p>Please allow location permissions to find your nearest Culver's Flavors.</p>
-                  </div>
-                `;
-              }
-            },
-            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
-          );
-        }
+        // Step 3: Request precise phone GPS
+        requestLiveGPS(false);
       }
 
-      // Refresh button
+      // Refresh button: forces a fresh live GPS poll and refetch
       refreshBtn.addEventListener('click', () => {
-        let cached = null;
-        try {
-          const raw = localStorage.getItem(CACHE_KEY);
-          if (raw) cached = JSON.parse(raw);
-        } catch {}
+        requestLiveGPS(true);
+      });
 
-        if (cached?.lat && cached?.lon) {
-          fetchFlavors(cached.lat, cached.lon, cached.cityName);
-        } else {
-          initializeLocation();
+      // When tab becomes active / phone unlocks / app re-focused
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          // If more than 3 minutes passed since last GPS check, request fresh GPS
+          if (Date.now() - lastGpsTimestamp > 180000) {
+            requestLiveGPS(false);
+          }
+        }
+      });
+
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted || Date.now() - lastGpsTimestamp > 180000) {
+          requestLiveGPS(false);
         }
       });
 
