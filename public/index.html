@@ -875,17 +875,26 @@
 
       async function loadUpcomingCalendar(slug, containerEl) {
         if (!slug || !containerEl) return;
-        if (calendarCache.has(slug)) {
-          renderUpcomingFlavors(calendarCache.get(slug), containerEl, slug);
+
+        const localToday = new Intl.DateTimeFormat('en-CA', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).format(new Date());
+
+        const cacheKey = `${slug}_${localToday}`;
+
+        if (calendarCache.has(cacheKey)) {
+          renderUpcomingFlavors(calendarCache.get(cacheKey), containerEl, slug);
           return;
         }
 
         try {
-          const res = await fetch(`/api/calendar?slug=${encodeURIComponent(slug)}`);
+          const res = await fetch(`/api/calendar?slug=${encodeURIComponent(slug)}&date=${localToday}`);
           if (!res.ok) throw new Error('Calendar fetch failed');
           const data = await res.json();
           const upcoming = data.upcoming || [];
-          calendarCache.set(slug, upcoming);
+          calendarCache.set(cacheKey, upcoming);
           renderUpcomingFlavors(upcoming, containerEl, slug);
         } catch (e) {
           containerEl.style.display = 'none';

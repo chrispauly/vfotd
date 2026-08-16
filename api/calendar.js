@@ -56,7 +56,19 @@ export default async function handler(request) {
       try {
         const json = JSON.parse(nextDataMatch[1]);
         const allFlavors = json.props?.pageProps?.page?.customData?.restaurantCalendar?.flavors || [];
-        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Support client's local date param if provided, otherwise compute in Central Time
+        const dateParam = (url.searchParams.get('date') || '').trim();
+        const isValidDateParam = /^\d{4}-\d{2}-\d{2}$/.test(dateParam);
+
+        const todayStr = isValidDateParam
+          ? dateParam
+          : new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'America/Chicago',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            }).format(new Date());
 
         upcoming = allFlavors
           .filter(f => f.onDate && f.onDate.split('T')[0] > todayStr)
@@ -65,11 +77,12 @@ export default async function handler(request) {
           .map(f => {
             const rawDate = f.onDate.split('T')[0];
             const [year, month, day] = rawDate.split('-').map(Number);
-            const d = new Date(year, month - 1, day);
+            // Instantiate at noon (12:00) to avoid any edge timezone day shifts
+            const d = new Date(year, month - 1, day, 12, 0, 0);
             return {
               date: rawDate,
-              dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
-              dateFormatted: d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }),
+              dayName: d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'America/Chicago' }),
+              dateFormatted: d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', timeZone: 'America/Chicago' }),
               title: f.title || f.name || 'Flavor of the Day',
               slug: f.urlSlug || '',
               image: f.image?.src || f.image?.imagePath || null

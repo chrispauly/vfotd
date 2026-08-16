@@ -234,16 +234,17 @@ async function runTests() {
   });
 
   await testAsync('Fetches upcoming 4-day calendar for valid restaurant slug', async () => {
-    const req = new Request('http://localhost:3000/api/calendar?slug=madison-todd-drive');
+    const req = new Request('http://localhost:3000/api/calendar?slug=madison-todd-drive&date=2026-08-15');
     const res = await calendarHandler(req);
     assert.strictEqual(res.status, 200);
     const data = await res.json();
     assert.strictEqual(data.slug, 'madison-todd-drive');
     assert.ok(Array.isArray(data.upcoming), 'Should return upcoming array');
+    assert.strictEqual(data.upcoming.length, 4);
+    assert.strictEqual(data.upcoming[0].dayName, 'Sun');
+    assert.strictEqual(data.upcoming[0].dateFormatted, '8/16');
     console.log(`      Upcoming days retrieved: ${data.upcoming.length}`);
-    if (data.upcoming.length > 0) {
-      console.log(`      First upcoming: ${data.upcoming[0].dayName} (${data.upcoming[0].dateFormatted}) -> ${data.upcoming[0].title}`);
-    }
+    console.log(`      First upcoming day: ${data.upcoming[0].dayName} (${data.upcoming[0].dateFormatted}) -> ${data.upcoming[0].title}`);
   });
 
   console.log(`\n========================================`);
