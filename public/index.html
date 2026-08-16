@@ -33,6 +33,25 @@
       --text-main: #0f172a;
       --text-muted: #64748b;
       --text-light: #94a3b8;
+      --link-color: #005696;
+      --link-hover-color: #003e6d;
+      --btn-bg: #f8fafc;
+      --btn-border: #cbd5e1;
+      --btn-text: #005696;
+      --btn-hover-bg: #005696;
+      --btn-hover-text: #ffffff;
+      --btn-hover-border: #005696;
+      --pill-date-bg: rgba(0, 86, 150, 0.08);
+      --pill-date-text: #005696;
+      --pill-date-border: rgba(0, 86, 150, 0.15);
+      --day-card-bg: #ffffff;
+      --day-card-border: #e2e8f0;
+      --calendar-subtle-bg: #f8fafc;
+      --flavor-card-bg: linear-gradient(180deg, #f8fafc 0%, rgba(0, 86, 150, 0.05) 100%);
+      --flavor-card-border: #e2e8f0;
+      --skeleton-start: #e2e8f0;
+      --skeleton-mid: #f1f5f9;
+      --skeleton-end: #e2e8f0;
       --success-bg: #ecfdf5;
       --success-text: #059669;
       --closed-bg: #fef2f2;
@@ -54,6 +73,25 @@
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         --text-light: #64748b;
+        --link-color: #38bdf8;
+        --link-hover-color: #7dd3fc;
+        --btn-bg: rgba(56, 189, 248, 0.12);
+        --btn-border: rgba(56, 189, 248, 0.35);
+        --btn-text: #38bdf8;
+        --btn-hover-bg: #38bdf8;
+        --btn-hover-text: #0b1320;
+        --btn-hover-border: #38bdf8;
+        --pill-date-bg: rgba(56, 189, 248, 0.18);
+        --pill-date-text: #38bdf8;
+        --pill-date-border: rgba(56, 189, 248, 0.4);
+        --day-card-bg: #0f172a;
+        --day-card-border: #334155;
+        --calendar-subtle-bg: rgba(15, 23, 42, 0.7);
+        --flavor-card-bg: linear-gradient(180deg, #0f172a 0%, rgba(56, 189, 248, 0.08) 100%);
+        --flavor-card-border: #334155;
+        --skeleton-start: #1e293b;
+        --skeleton-mid: #334155;
+        --skeleton-end: #1e293b;
         --success-bg: #064e3b;
         --success-text: #6ee7b7;
         --closed-bg: #7f1d1d;
@@ -119,10 +157,19 @@
 
     .brand-title {
       font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
       font-weight: 800;
-      font-size: 1.45rem;
-      letter-spacing: -0.02em;
-      color: #ffffff;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .brand-title svg {
+      width: 24px;
+      height: 24px;
+      color: var(--culvers-accent);
     }
 
     .sub-row {
@@ -134,18 +181,18 @@
     }
 
     .refresh-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
       background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.28);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.4rem 0.8rem;
       border-radius: var(--radius-full);
-      padding: 0.35rem 0.8rem;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      backdrop-filter: blur(8px);
       transition: var(--transition);
     }
 
@@ -196,7 +243,7 @@
 
     /* Main Content Container */
     main {
-      max-width: 980px;
+      max-width: 1140px;
       width: 100%;
       margin: -0.75rem auto 2.5rem;
       padding: 0 1.25rem;
@@ -227,7 +274,7 @@
     .card:hover {
       box-shadow: var(--shadow-lg);
       transform: translateY(-2px);
-      border-color: rgba(0, 86, 150, 0.4);
+      border-color: rgba(56, 189, 248, 0.4);
     }
 
     .card-info {
@@ -290,19 +337,19 @@
       gap: 0.35rem;
       font-size: 0.82rem;
       font-weight: 600;
-      color: var(--culvers-blue);
+      color: var(--btn-text);
       text-decoration: none;
-      padding: 0.3rem 0.65rem;
+      padding: 0.35rem 0.7rem;
       border-radius: var(--radius-md);
-      background-color: var(--surface-subtle);
-      border: 1px solid var(--surface-border);
+      background-color: var(--btn-bg);
+      border: 1px solid var(--btn-border);
       transition: var(--transition);
     }
 
     .action-link:hover {
-      background-color: var(--culvers-blue);
-      color: #ffffff;
-      border-color: var(--culvers-blue);
+      background-color: var(--btn-hover-bg);
+      color: var(--btn-hover-text);
+      border-color: var(--btn-hover-border);
     }
 
     /* Upcoming 4-Day Flavor Calendar Strip */
@@ -310,7 +357,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      background: var(--surface-subtle);
+      background: var(--calendar-subtle-bg);
       border: 1px solid var(--surface-border);
       border-radius: var(--radius-md);
       padding: 0.85rem;
@@ -334,13 +381,15 @@
     }
 
     .calendar-link-more {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--culvers-blue);
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--link-color);
       text-decoration: none;
+      transition: var(--transition);
     }
 
     .calendar-link-more:hover {
+      color: var(--link-hover-color);
       text-decoration: underline;
     }
 
@@ -351,8 +400,8 @@
     }
 
     .upcoming-day-card {
-      background: var(--surface-bg);
-      border: 1px solid var(--surface-border);
+      background: var(--day-card-bg);
+      border: 1px solid var(--day-card-border);
       border-radius: var(--radius-md);
       padding: 0.5rem 0.3rem;
       display: flex;
@@ -367,7 +416,7 @@
 
     .upcoming-day-card:hover {
       transform: translateY(-2px);
-      border-color: var(--culvers-blue-light);
+      border-color: var(--link-color);
       box-shadow: var(--shadow-sm);
     }
 
@@ -375,9 +424,10 @@
       font-family: 'Outfit', sans-serif;
       font-size: 0.65rem;
       font-weight: 800;
-      color: var(--culvers-blue);
-      background: rgba(0, 86, 150, 0.08);
-      padding: 0.12rem 0.35rem;
+      color: var(--pill-date-text);
+      background: var(--pill-date-bg);
+      border: 1px solid var(--pill-date-border);
+      padding: 0.12rem 0.4rem;
       border-radius: var(--radius-full);
       margin-bottom: 0.35rem;
       white-space: nowrap;
@@ -415,7 +465,7 @@
     .upcoming-skeleton-item {
       height: 90px;
       border-radius: var(--radius-md);
-      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background: linear-gradient(90deg, var(--skeleton-start) 25%, var(--skeleton-mid) 50%, var(--skeleton-end) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
@@ -428,8 +478,8 @@
       text-align: center;
       text-decoration: none;
       color: inherit;
-      background: linear-gradient(180deg, var(--surface-subtle) 0%, rgba(0, 86, 150, 0.05) 100%);
-      border: 1px solid var(--surface-border);
+      background: var(--flavor-card-bg);
+      border: 1px solid var(--flavor-card-border);
       border-radius: var(--radius-md);
       padding: 1.15rem 1rem;
       transition: var(--transition);
@@ -438,7 +488,7 @@
 
     .card-flavor:hover {
       background: linear-gradient(180deg, rgba(0, 86, 150, 0.05) 0%, rgba(0, 86, 150, 0.12) 100%);
-      border-color: var(--culvers-blue-light);
+      border-color: var(--link-color);
     }
 
     .flavor-badge {
@@ -508,7 +558,7 @@
 
     .skeleton-line {
       height: 16px;
-      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background: linear-gradient(90deg, var(--skeleton-start) 25%, var(--skeleton-mid) 50%, var(--skeleton-end) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
       border-radius: 4px;
@@ -519,7 +569,7 @@
       width: 100%;
       height: 190px;
       border-radius: var(--radius-md);
-      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background: linear-gradient(90deg, var(--skeleton-start) 25%, var(--skeleton-mid) 50%, var(--skeleton-end) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
