@@ -1090,159 +1090,264 @@
         containerEl.appendChild(grid);
       }
 
-      async function fetchFlavors(lat, lon, cityName) {
+      const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes fresh threshold
+      let activeFetchId = 0;
+      let lastGpsTimestamp = 0;
+      let currentRenderedCoords = null;
+      let isResolvingLocation = false;
+
+      function extractCityFromLocations(locations) {
+        if (locations && locations.length > 0) {
+          const firstMeta = locations[0]?.metadata;
+          if (firstMeta?.city && firstMeta?.state) {
+            return `${firstMeta.city}, ${firstMeta.state}`;
+          }
+          if (firstMeta?.city) return firstMeta.city;
+        }
+        return null;
+      }
+
+      function getPositionPromise(options, timeoutMs) {
+        return new Promise((resolve, reject) => {
+          if (!navigator.geolocation) {
+            return reject(new Error('Geolocation not supported'));
+          }
+          let timedOut = false;
+          const timer = setTimeout(() => {
+            timedOut = true;
+            reject(new Error('GPS timeout'));
+          }, timeoutMs);
+
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              if (!timedOut) {
+                clearTimeout(timer);
+                resolve(pos);
+              }
+            },
+            (err) => {
+              if (!timedOut) {
+                clearTimeout(timer);
+                reject(err);
+              }
+            },
+            options
+          );
+        });
+      }
+
+      async function fetchFlavors(lat, lon, knownCityName, isOptimistic = false) {
+        const thisFetchId = ++activeFetchId;
         refreshBtn.classList.add('spinning');
         try {
           const res = await fetch(`/api/fotd?lat=${lat}&lon=${lon}`);
           if (!res.ok) throw new Error(`API error (${res.status})`);
 
           const data = await res.json();
+          // Drop stale responses if a newer fetch was initiated
+          if (thisFetchId !== activeFetchId) return true;
+
           const geofences = data?.data?.geofences || [];
 
-          renderLocations(geofences, cityName);
+          // Derive best city name
+          let displayCity = knownCityName;
+          if (!displayCity || displayCity === 'Your Location' || displayCity === 'Current Location' || displayCity === 'Your Area') {
+            const nearestCity = extractCityFromLocations(geofences);
+            if (nearestCity) {
+              displayCity = nearestCity;
+            }
+          }
+
+          renderLocations(geofences, displayCity || 'Your Location');
           fetchTimeEl.textContent = `Updated: ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
-          // Save to local storage cache for instant next load
+          // Update cache with fresh timestamp
           try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ lat, lon, cityName, timestamp: Date.now() }));
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+              lat,
+              lon,
+              cityName: displayCity || 'Your Location',
+              timestamp: Date.now()
+            }));
           } catch {}
 
+          currentRenderedCoords = { lat, lon, cityName: displayCity };
           return true;
         } catch (err) {
+          if (thisFetchId !== activeFetchId) return false;
           console.error('Fetch error:', err);
-          container.innerHTML = `
-            <div class="empty-state">
-              <h3>Unable to Load Flavors</h3>
-              <p>Please check your connection and try again.</p>
-            </div>
-          `;
+          if (!currentRenderedCoords) {
+            container.innerHTML = `
+              <div class="empty-state">
+                <img class="empty-state-icon" src="/ice-cream.svg" alt="Ice Cream Cone">
+                <h3>Unable to Load Flavors</h3>
+                <p>Please check your internet connection and try again.</p>
+                <button id="retry-fetch-btn" class="empty-search-btn" style="cursor:pointer;border:none;">
+                  <span>Retry</span>
+                </button>
+              </div>
+            `;
+            const retryBtn = document.getElementById('retry-fetch-btn');
+            if (retryBtn) {
+              retryBtn.addEventListener('click', () => resolveLocationAndFetch(true));
+            }
+          }
           return false;
         } finally {
-          refreshBtn.classList.remove('spinning');
+          if (thisFetchId === activeFetchId) {
+            refreshBtn.classList.remove('spinning');
+          }
         }
       }
 
-      async function reverseGeocode(lat, lon) {
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
-          if (!res.ok) return null;
-          const data = await res.json();
-          const addr = data.address || {};
-          return addr.city || addr.town || addr.village || addr.county || null;
-        } catch {
-          return null;
+      function renderLocationPermissionState() {
+        container.innerHTML = `
+          <div class="empty-state">
+            <img class="empty-state-icon" src="/ice-cream.svg" alt="Ice Cream Cone">
+            <h3>Location Access Needed</h3>
+            <p>We need your location to show the closest Culver's Flavor of the Day.</p>
+            <button id="enable-location-btn" class="empty-search-btn" style="cursor:pointer;border:none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+              </svg>
+              <span>Find Flavors Near Me</span>
+            </button>
+          </div>
+        `;
+        const enableBtn = document.getElementById('enable-location-btn');
+        if (enableBtn) {
+          enableBtn.addEventListener('click', () => {
+            resolveLocationAndFetch(true);
+          });
         }
       }
 
-      let lastGpsTimestamp = 0;
-
-      function requestLiveGPS(forceUpdate = false) {
-        if (!navigator.geolocation) return;
-
+      async function resolveLocationAndFetch(forceRefresh = false) {
+        if (isResolvingLocation && !forceRefresh) return;
+        isResolvingLocation = true;
         refreshBtn.classList.add('spinning');
 
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            lastGpsTimestamp = Date.now();
-
-            let cached = null;
-            try {
-              const raw = localStorage.getItem(CACHE_KEY);
-              if (raw) cached = JSON.parse(raw);
-            } catch {}
-
-            // Calculate approximate distance moved (0.003 deg is ~300 meters / 0.2 miles)
-            const distanceMoved = cached
-              ? Math.hypot(cached.lat - lat, cached.lon - lon)
-              : 999;
-
-            if (forceUpdate || !cached || distanceMoved > 0.003) {
-              const cityName = (await reverseGeocode(lat, lon)) || 'Current Location';
-              locationBadge.textContent = cityName;
-              await fetchFlavors(lat, lon, cityName);
-            } else {
-              refreshBtn.classList.remove('spinning');
-            }
-          },
-          (err) => {
-            console.warn('Geolocation error:', err.message);
-            refreshBtn.classList.remove('spinning');
-            let cached = null;
-            try {
-              const raw = localStorage.getItem(CACHE_KEY);
-              if (raw) cached = JSON.parse(raw);
-            } catch {}
-
-            if (!cached) {
-              locationBadge.textContent = 'Location Required';
-              container.innerHTML = `
-                <div class="empty-state">
-                  <h3>Location Access Required</h3>
-                  <p>Please enable device location permissions to find your nearest Flavor of the Day.</p>
-                </div>
-              `;
-            }
-          },
-          {
-            enableHighAccuracy: true, // Forces actual GPS hardware on phones
-            timeout: 10000,
-            maximumAge: forceUpdate ? 0 : 30000 // Force fresh position on refresh
-          }
-        );
-      }
-
-      async function initializeLocation() {
-        // Step 1: Check cached location for instant paint
         let cached = null;
         try {
           const raw = localStorage.getItem(CACHE_KEY);
           if (raw) cached = JSON.parse(raw);
         } catch {}
 
-        if (cached && cached.lat && cached.lon) {
+        const now = Date.now();
+        const hasCachedCoords = Boolean(cached && cached.lat && cached.lon);
+        const isCacheFresh = hasCachedCoords && cached.timestamp && (now - cached.timestamp < CACHE_TTL_MS);
+
+        // 1. Optimistic Fast Paint: If we have cached coords and this isn't a forced refresh, paint immediately
+        if (hasCachedCoords && !forceRefresh) {
           locationBadge.textContent = cached.cityName || 'Your Location';
-          fetchFlavors(cached.lat, cached.lon, cached.cityName);
+          currentRenderedCoords = { lat: cached.lat, lon: cached.lon, cityName: cached.cityName };
+          fetchFlavors(cached.lat, cached.lon, cached.cityName, true);
         }
 
-        // Step 2: In parallel, inspect Edge Geo if cached is missing
-        if (!cached) {
+        let locationResolved = false;
+
+        // 2. Stage A: Fast Coarse GPS (cell/Wi-Fi triangulation, fast 3.5s timeout, low battery impact)
+        try {
+          const coarsePos = await getPositionPromise(
+            { enableHighAccuracy: false, timeout: 3500, maximumAge: 60000 },
+            3500
+          );
+          const lat = coarsePos.coords.latitude;
+          const lon = coarsePos.coords.longitude;
+          lastGpsTimestamp = Date.now();
+
+          const distanceMoved = currentRenderedCoords
+            ? Math.hypot(currentRenderedCoords.lat - lat, currentRenderedCoords.lon - lon)
+            : 999;
+
+          // If moved > 300m (~0.003 deg) or if forced or cache was stale/missing, update immediately!
+          if (forceRefresh || !isCacheFresh || distanceMoved > 0.003) {
+            locationBadge.textContent = 'Updating...';
+            await fetchFlavors(lat, lon, null);
+          }
+          locationResolved = true;
+        } catch (coarseErr) {
+          // Coarse GPS failed/timed out or blocked
+        }
+
+        // 3. Stage B: Edge IP-Geo Fallback (runs if coarse GPS timed out, failed, or was indoors)
+        if (!locationResolved) {
           try {
             const geoRes = await fetch('/api/geo');
             if (geoRes.ok) {
               const geoData = await geoRes.json();
               if (geoData.hasGeo && geoData.latitude && geoData.longitude) {
-                const edgeCity = geoData.city ? `${geoData.city}, ${geoData.region || ''}` : 'Your Area';
-                locationBadge.textContent = edgeCity;
-                fetchFlavors(geoData.latitude, geoData.longitude, edgeCity);
+                const edgeCity = geoData.city
+                  ? (geoData.region ? `${geoData.city}, ${geoData.region}` : geoData.city)
+                  : null;
+
+                const distanceMoved = currentRenderedCoords
+                  ? Math.hypot(currentRenderedCoords.lat - geoData.latitude, currentRenderedCoords.lon - geoData.longitude)
+                  : 999;
+
+                // Update if moved > 3 miles (~0.045 deg) or cache was stale/missing
+                if (forceRefresh || !isCacheFresh || distanceMoved > 0.045) {
+                  locationBadge.textContent = edgeCity || 'Your Area';
+                  await fetchFlavors(geoData.latitude, geoData.longitude, edgeCity);
+                }
+                locationResolved = true;
               }
             }
-          } catch {}
+          } catch (edgeErr) {
+            // Edge geo failed
+          }
         }
 
-        // Step 3: Request precise phone GPS
-        requestLiveGPS(false);
+        // 4. Stage C: High-Accuracy GPS Fine-Tuning (satellite precision)
+        try {
+          const finePos = await getPositionPromise(
+            { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 },
+            7500
+          );
+          const fineLat = finePos.coords.latitude;
+          const fineLon = finePos.coords.longitude;
+          lastGpsTimestamp = Date.now();
+
+          const distanceMoved = currentRenderedCoords
+            ? Math.hypot(currentRenderedCoords.lat - fineLat, currentRenderedCoords.lon - fineLon)
+            : 999;
+
+          if (forceRefresh || distanceMoved > 0.003 || !currentRenderedCoords) {
+            await fetchFlavors(fineLat, fineLon, null);
+          }
+          locationResolved = true;
+        } catch (fineErr) {
+          // Fine GPS failed / timed out
+        }
+
+        // 5. Final fallback if nothing worked and no cache was rendered
+        if (!locationResolved && !currentRenderedCoords) {
+          locationBadge.textContent = 'Location Required';
+          renderLocationPermissionState();
+        }
+
+        refreshBtn.classList.remove('spinning');
+        isResolvingLocation = false;
       }
 
-      // Refresh button: forces a fresh live GPS poll and refetch
+      // Refresh button: forces live GPS & Edge re-query without relying on old cache
       refreshBtn.addEventListener('click', () => {
-        requestLiveGPS(true);
+        resolveLocationAndFetch(true);
       });
 
       // When tab becomes active / phone unlocks / app re-focused
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-          // If more than 3 minutes passed since last GPS check, request fresh GPS
           if (Date.now() - lastGpsTimestamp > 180000) {
-            requestLiveGPS(false);
+            resolveLocationAndFetch(false);
           }
         }
       });
 
       window.addEventListener('pageshow', (event) => {
         if (event.persisted || Date.now() - lastGpsTimestamp > 180000) {
-          requestLiveGPS(false);
+          resolveLocationAndFetch(false);
         }
       });
 
@@ -1256,7 +1361,7 @@
         }, Math.max(1000, msUntil6am));
       }
 
-      initializeLocation();
+      resolveLocationAndFetch(false);
       scheduleNextFlavorRefresh();
     })();
   </script>
